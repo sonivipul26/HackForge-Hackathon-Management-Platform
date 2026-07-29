@@ -6,12 +6,15 @@ import Home from './pages/Home';
 import Login from './pages/Login';
 import Register from './pages/Register';
 import Profile from './pages/Profile';
+import Hackathons from './pages/Hackathons';
+import HackathonDetail from './pages/HackathonDetail';
+import CreateHackathon from './pages/CreateHackathon';
+import OrganizerDashboard from './pages/OrganizerDashboard';
 import ProtectedRoute from './routes/ProtectedRoute';
+import RoleRoute from './routes/RoleRoute';
 
 /**
  * Root Application Component
- *
- * Configured with AuthProvider global state wrapper and routes.
  */
 function App() {
   return (
@@ -21,8 +24,11 @@ function App() {
         <main>
           <Routes>
             <Route path="/" element={<Home />} />
+            <Route path="/hackathons" element={<Hackathons />} />
+            <Route path="/hackathons/:id" element={<HackathonDetail />} />
             <Route path="/login" element={<Login />} />
             <Route path="/register" element={<Register />} />
+            
             <Route
               path="/profile"
               element={
@@ -31,6 +37,25 @@ function App() {
                 </ProtectedRoute>
               }
             />
+
+            <Route
+              path="/organizer/dashboard"
+              element={
+                <RoleRoute allowedRoles={['organizer', 'admin']}>
+                  <OrganizerDashboard />
+                </RoleRoute>
+              }
+            />
+
+            <Route
+              path="/organizer/create-hackathon"
+              element={
+                <RoleRoute allowedRoles={['organizer', 'admin']}>
+                  <CreateHackathon />
+                </RoleRoute>
+              }
+            />
+
             <Route
               path="*"
               element={
