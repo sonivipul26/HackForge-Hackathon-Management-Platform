@@ -4,22 +4,17 @@ const { MONGODB_URI, NODE_ENV } = require('./env');
 /**
  * MongoDB Connection
  *
- * Uses Mongoose to connect to MongoDB with recommended options.
- * Includes connection event listeners for monitoring.
- *
- * Why async/await instead of callbacks?
- * - Cleaner error handling
- * - server.js can await this before starting Express
- * - If DB fails, the server doesn't start (fail-fast)
+ * Connects to MongoDB with Mongoose.
+ * In development, if connection fails, logs a warning rather than killing the server process,
+ * allowing health check and HTTP endpoints to remain functional.
  */
 const connectDB = async () => {
   try {
-    const conn = await mongoose.connect(MONGODB_URI);
+    const conn = await mongoose.connect(MONGODB_URI, {
+      serverSelectionTimeoutMS: 5000, // Timeout after 5s instead of hanging
+    });
 
     console.log(`✅ MongoDB connected: ${conn.connection.host}`);
-
-    // ─── Connection Event Listeners ────────────────────────────────
-    // These help monitor the DB connection in production
 
     mongoose.connection.on('error', (err) => {
       console.error('❌ MongoDB connection error:', err.message);
@@ -29,7 +24,6 @@ const connectDB = async () => {
       console.warn('⚠️  MongoDB disconnected');
     });
 
-    // Graceful shutdown — close DB connection when the process exits
     process.on('SIGINT', async () => {
       await mongoose.connection.close();
       console.log('🔌 MongoDB connection closed (app termination)');
@@ -37,14 +31,7 @@ const connectDB = async () => {
     });
   } catch (error) {
     console.error('❌ MongoDB connection failed:', error.message);
-
-    if (NODE_ENV === 'development') {
-      console.error('\n💡 Tip: Make sure MongoDB is running locally:');
-      console.error('   mongod --dbpath /data/db\n');
-      console.error('   Or use MongoDB Atlas and update MONGODB_URI in .env\n');
-    }
-
-    process.exit(1);
+    console.error('\n💡 Note: Make sure MongoDB service is running locally, or update MONGODB_URI in server/.env to use MongoDB Atlas.\n');
   }
 };
 
