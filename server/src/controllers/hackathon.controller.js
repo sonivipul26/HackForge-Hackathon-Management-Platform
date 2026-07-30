@@ -59,6 +59,32 @@ const getMyEvents = asyncHandler(async (req, res) => {
   res.status(200).json(new ApiResponse(200, 'Hosted hackathons retrieved', { hackathons }));
 });
 
+// @desc    Assign a judge to a hackathon
+// @route   POST /api/v1/hackathons/:id/judges
+// @access  Protected (Organizer, Admin)
+const assignJudge = asyncHandler(async (req, res) => {
+  const { judgeId } = req.body;
+  const hackathon = await hackathonService.assignJudge(req.params.id, judgeId, req.user._id, req.user.role);
+  res.status(200).json(new ApiResponse(200, 'Judge assigned successfully', { hackathon }));
+});
+
+// @desc    Remove a judge from a hackathon
+// @route   DELETE /api/v1/hackathons/:id/judges/:judgeId
+// @access  Protected (Organizer, Admin)
+const removeJudge = asyncHandler(async (req, res) => {
+  const hackathon = await hackathonService.removeJudge(req.params.id, req.params.judgeId, req.user._id, req.user.role);
+  res.status(200).json(new ApiResponse(200, 'Judge removed successfully', { hackathon }));
+});
+
+// @desc    Toggle registration open/closed for a hackathon
+// @route   PUT /api/v1/hackathons/:id/toggle-registration
+// @access  Protected (Organizer, Admin)
+const toggleRegistration = asyncHandler(async (req, res) => {
+  const hackathon = await hackathonService.toggleRegistration(req.params.id, req.user._id, req.user.role);
+  const status = hackathon.registrationOpen ? 'opened' : 'closed';
+  res.status(200).json(new ApiResponse(200, `Registration ${status} successfully`, { hackathon }));
+});
+
 module.exports = {
   create,
   getAll,
@@ -66,4 +92,8 @@ module.exports = {
   update,
   remove,
   getMyEvents,
+  assignJudge,
+  removeJudge,
+  toggleRegistration,
 };
+

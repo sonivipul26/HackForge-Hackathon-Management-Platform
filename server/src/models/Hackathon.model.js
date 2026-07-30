@@ -121,6 +121,16 @@ const hackathonSchema = new mongoose.Schema(
       type: Boolean,
       default: false,
     },
+    registrationOpen: {
+      type: Boolean,
+      default: true,
+    },
+    judges: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'User',
+      },
+    ],
   },
   {
     timestamps: true,

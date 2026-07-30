@@ -6,6 +6,9 @@ const {
   update,
   remove,
   getMyEvents,
+  assignJudge,
+  removeJudge,
+  toggleRegistration,
 } = require('../controllers/hackathon.controller');
 const { validateHackathonInput } = require('../validators/hackathon.validator');
 const { protect, authorize } = require('../middleware/auth.middleware');
@@ -44,4 +47,26 @@ router.delete(
   remove
 );
 
+router.post(
+  '/:id/judges',
+  protect,
+  authorize(USER_ROLES.ORGANIZER, USER_ROLES.ADMIN),
+  assignJudge
+);
+
+router.delete(
+  '/:id/judges/:judgeId',
+  protect,
+  authorize(USER_ROLES.ORGANIZER, USER_ROLES.ADMIN),
+  removeJudge
+);
+
+router.put(
+  '/:id/toggle-registration',
+  protect,
+  authorize(USER_ROLES.ORGANIZER, USER_ROLES.ADMIN),
+  toggleRegistration
+);
+
 module.exports = router;
+

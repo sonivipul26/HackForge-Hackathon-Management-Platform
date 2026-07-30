@@ -1,8 +1,9 @@
 import api from './axios';
 
-/**
- * Hackathon API Client
- */
+export const createHackathonApi = async (hackathonData) => {
+  const response = await api.post('/hackathons', hackathonData);
+  return response.data;
+};
 
 export const getHackathonsApi = async (params = {}) => {
   const response = await api.get('/hackathons', { params });
@@ -11,11 +12,6 @@ export const getHackathonsApi = async (params = {}) => {
 
 export const getHackathonByIdApi = async (idOrSlug) => {
   const response = await api.get(`/hackathons/${idOrSlug}`);
-  return response.data;
-};
-
-export const createHackathonApi = async (hackathonData) => {
-  const response = await api.post('/hackathons', hackathonData);
   return response.data;
 };
 
@@ -29,7 +25,24 @@ export const deleteHackathonApi = async (id) => {
   return response.data;
 };
 
-export const getMyEventsApi = async () => {
+export const getMyHostedEventsApi = async () => {
   const response = await api.get('/hackathons/organizer/my-events');
+  return response.data;
+};
+
+export const getMyEventsApi = getMyHostedEventsApi;
+
+export const assignJudgeApi = async (hackathonId, judgeId) => {
+  const response = await api.post(`/hackathons/${hackathonId}/judges`, { judgeId });
+  return response.data;
+};
+
+export const removeJudgeApi = async (hackathonId, judgeId) => {
+  const response = await api.delete(`/hackathons/${hackathonId}/judges/${judgeId}`);
+  return response.data;
+};
+
+export const toggleRegistrationStatusApi = async (hackathonId) => {
+  const response = await api.put(`/hackathons/${hackathonId}/toggle-registration`);
   return response.data;
 };

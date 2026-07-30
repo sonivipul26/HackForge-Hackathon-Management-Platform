@@ -10,6 +10,14 @@ import Hackathons from './pages/Hackathons';
 import HackathonDetail from './pages/HackathonDetail';
 import CreateHackathon from './pages/CreateHackathon';
 import OrganizerDashboard from './pages/OrganizerDashboard';
+import AdminDashboard from './pages/AdminDashboard';
+import Dashboard from './pages/Dashboard';
+import TeamManagement from './pages/TeamManagement';
+import JudgingConsole from './pages/JudgingConsole';
+import SubmitProject from './pages/SubmitProject';
+import Projects from './pages/Projects';
+import Leaderboard from './pages/Leaderboard';
+import NotFound from './pages/NotFound';
 import ProtectedRoute from './routes/ProtectedRoute';
 import RoleRoute from './routes/RoleRoute';
 
@@ -26,15 +34,53 @@ function App() {
             <Route path="/" element={<Home />} />
             <Route path="/hackathons" element={<Hackathons />} />
             <Route path="/hackathons/:id" element={<HackathonDetail />} />
+            <Route path="/projects" element={<Projects />} />
+            <Route path="/leaderboard" element={<Leaderboard />} />
             <Route path="/login" element={<Login />} />
             <Route path="/register" element={<Register />} />
             
+            <Route
+              path="/dashboard"
+              element={
+                <ProtectedRoute>
+                  <Dashboard />
+                </ProtectedRoute>
+              }
+            />
+
+            <Route
+              path="/teams"
+              element={
+                <ProtectedRoute>
+                  <TeamManagement />
+                </ProtectedRoute>
+              }
+            />
+
+            <Route
+              path="/submit-project"
+              element={
+                <ProtectedRoute>
+                  <SubmitProject />
+                </ProtectedRoute>
+              }
+            />
+
             <Route
               path="/profile"
               element={
                 <ProtectedRoute>
                   <Profile />
                 </ProtectedRoute>
+              }
+            />
+
+            <Route
+              path="/judging"
+              element={
+                <RoleRoute allowedRoles={['judge', 'admin']}>
+                  <JudgingConsole />
+                </RoleRoute>
               }
             />
 
@@ -57,14 +103,15 @@ function App() {
             />
 
             <Route
-              path="*"
+              path="/admin/dashboard"
               element={
-                <div className="max-w-7xl mx-auto px-4 py-24 text-center">
-                  <h2 className="text-3xl font-bold text-slate-900">Page Coming Soon</h2>
-                  <p className="mt-2 text-slate-600">This module will be introduced in subsequent phases.</p>
-                </div>
+                <RoleRoute allowedRoles={['admin']}>
+                  <AdminDashboard />
+                </RoleRoute>
               }
             />
+
+            <Route path="*" element={<NotFound />} />
           </Routes>
         </main>
       </div>

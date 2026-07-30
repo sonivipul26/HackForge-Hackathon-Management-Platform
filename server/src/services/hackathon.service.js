@@ -115,6 +115,49 @@ const getMyHostedHackathons = async (organizerId) => {
   return hackathons;
 };
 
+const assignJudge = async (hackathonId, judgeId, organizerId, userRole) => {
+  const hackathon = await Hackathon.findById(hackathonId);
+  if (!hackathon) throw new ApiError(404, 'Hackathon not found');
+
+  if (userRole !== 'admin' && hackathon.organizer.toString() !== organizerId.toString()) {
+    throw new ApiError(403, 'Not authorized to assign judges to this hackathon');
+  }
+
+  if (hackathon.judges.includes(judgeId)) {
+    throw new ApiError(400, 'Judge is already assigned to this hackathon');
+  }
+
+  hackathon.judges.push(judgeId);
+  await hackathon.save();
+  return hackathon;
+};
+
+const removeJudge = async (hackathonId, judgeId, organizerId, userRole) => {
+  const hackathon = await Hackathon.findById(hackathonId);
+  if (!hackathon) throw new ApiError(404, 'Hackathon not found');
+
+  if (userRole !== 'admin' && hackathon.organizer.toString() !== organizerId.toString()) {
+    throw new ApiError(403, 'Not authorized to remove judges from this hackathon');
+  }
+
+  hackathon.judges = hackathon.judges.filter((j) => j.toString() !== judgeId.toString());
+  await hackathon.save();
+  return hackathon;
+};
+
+const toggleRegistration = async (hackathonId, organizerId, userRole) => {
+  const hackathon = await Hackathon.findById(hackathonId);
+  if (!hackathon) throw new ApiError(404, 'Hackathon not found');
+
+  if (userRole !== 'admin' && hackathon.organizer.toString() !== organizerId.toString()) {
+    throw new ApiError(403, 'Not authorized to modify this hackathon');
+  }
+
+  hackathon.registrationOpen = !hackathon.registrationOpen;
+  await hackathon.save();
+  return hackathon;
+};
+
 module.exports = {
   createHackathon,
   getHackathons,
@@ -122,4 +165,7 @@ module.exports = {
   updateHackathon,
   deleteHackathon,
   getMyHostedHackathons,
+  assignJudge,
+  removeJudge,
+  toggleRegistration,
 };

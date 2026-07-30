@@ -1,13 +1,13 @@
 import React from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
-import { FiSearch, FiUser, FiLogOut } from 'react-icons/fi';
+import { FiSearch, FiLogOut, FiLayout } from 'react-icons/fi';
 
 /**
  * Navbar Component
  *
  * Implements the top navigation bar matching the Stitch UI design.
- * Features brand logo, navigation links, global search bar, and auth state controls.
+ * Features brand logo, role-aware dashboard routing, navigation links, and auth controls.
  */
 const Navbar = () => {
   const location = useLocation();
@@ -15,6 +15,20 @@ const Navbar = () => {
   const { user, isAuthenticated, logout } = useAuth();
 
   const isActive = (path) => location.pathname === path;
+
+  const getDashboardPath = () => {
+    if (!user) return '/dashboard';
+    switch (user.role) {
+      case 'admin':
+        return '/admin/dashboard';
+      case 'organizer':
+        return '/organizer/dashboard';
+      case 'judge':
+        return '/judging';
+      default:
+        return '/dashboard';
+    }
+  };
 
   const handleLogout = () => {
     logout();
@@ -32,9 +46,9 @@ const Navbar = () => {
 
           <nav className="hidden md:flex items-center space-x-6">
             <Link
-              to="/"
+              to="/hackathons"
               className={`text-sm font-medium transition-colors ${
-                isActive('/') ? 'text-blue-600 font-semibold' : 'text-slate-600 hover:text-slate-900'
+                isActive('/hackathons') ? 'text-blue-600 font-semibold' : 'text-slate-600 hover:text-slate-900'
               }`}
             >
               Hackathons
@@ -55,14 +69,20 @@ const Navbar = () => {
             >
               Leaderboard
             </Link>
-            <Link
-              to="/rules"
-              className={`text-sm font-medium transition-colors ${
-                isActive('/rules') ? 'text-blue-600 font-semibold' : 'text-slate-600 hover:text-slate-900'
-              }`}
-            >
-              Rules
-            </Link>
+
+            {isAuthenticated && (
+              <Link
+                to={getDashboardPath()}
+                className={`text-sm font-semibold transition-colors flex items-center space-x-1 ${
+                  location.pathname.includes('dashboard') || location.pathname === '/judging'
+                    ? 'text-blue-600 font-bold'
+                    : 'text-slate-700 hover:text-blue-600'
+                }`}
+              >
+                <FiLayout className="text-xs" />
+                <span>Dashboard</span>
+              </Link>
+            )}
           </nav>
         </div>
 
